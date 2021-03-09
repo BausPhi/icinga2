@@ -171,6 +171,7 @@ void IcingaDB::UpdateAllConfigObjects()
 	};
 	DeleteKeys(globalKeys, Prio::Config);
 	DeleteKeys({"icinga:nextupdate:host", "icinga:nextupdate:service"}, Prio::CheckResult);
+	m_Rcon->Sync();
 
 	Defer resetDumpedGlobals ([this]() {
 		m_DumpedGlobals.CustomVar.Reset();
@@ -191,11 +192,11 @@ void IcingaDB::UpdateAllConfigObjects()
 		std::map<String, String> redisCheckSums;
 		String configCheckSum = m_PrefixConfigCheckSum + lcType;
 
-		upqObjectType.Enqueue([this, &configCheckSum, &redisCheckSums]() {
+		upqObjectType.Enqueue([&]() {
 			String cursor = "0";
 
 			do {
-				Array::Ptr res = m_Rcon->GetResultOfQuery({
+				Array::Ptr res = m_Rcons[type.first]->GetResultOfQuery({
 					"HSCAN", configCheckSum, cursor, "COUNT", "1000"
 				}, Prio::Config);
 
@@ -291,7 +292,7 @@ void IcingaDB::UpdateAllConfigObjects()
 
 					if (transaction.size() > 1) {
 						transaction.push_back({"EXEC"});
-						m_Rcon->FireAndForgetQueries(std::move(transaction), Prio::Config);
+						m_Rcons[type.first]->FireAndForgetQueries(std::move(transaction), Prio::Config);
 						transaction = {{"MULTI"}};
 					}
 				}
@@ -307,7 +308,7 @@ void IcingaDB::UpdateAllConfigObjects()
 					if (zAdds->size() >= 102u) {
 						std::vector<String> header (zAdds->begin(), zAdds->begin() + 2u);
 
-						m_Rcon->FireAndForgetQuery(std::move(*zAdds), Prio::CheckResult);
+						m_Rcons[type.first]->FireAndForgetQuery(std::move(*zAdds), Prio::CheckResult);
 
 						*zAdds = std::move(header);
 					}
@@ -341,12 +342,12 @@ void IcingaDB::UpdateAllConfigObjects()
 
 			if (transaction.size() > 1) {
 				transaction.push_back({"EXEC"});
-				m_Rcon->FireAndForgetQueries(std::move(transaction), Prio::Config);
+				m_Rcons[type.first]->FireAndForgetQueries(std::move(transaction), Prio::Config);
 			}
 
 			for (auto zAdds : {&hostZAdds, &serviceZAdds}) {
 				if (zAdds->size() > 2u) {
-					m_Rcon->FireAndForgetQuery(std::move(*zAdds), Prio::CheckResult);
+					m_Rcons[type.first]->FireAndForgetQuery(std::move(*zAdds), Prio::CheckResult);
 				}
 			}
 
@@ -408,7 +409,7 @@ void IcingaDB::UpdateAllConfigObjects()
 			setChecksum.clear();
 			setObject.clear();
 
-			m_Rcon->FireAndForgetQueries(std::move(transaction), Prio::Config);
+			m_Rcons[type.first]->FireAndForgetQueries(std::move(transaction), Prio::Config);
 		});
 
 		auto flushDels ([&]() {
@@ -425,7 +426,7 @@ void IcingaDB::UpdateAllConfigObjects()
 			delChecksum.clear();
 			delObject.clear();
 
-			m_Rcon->FireAndForgetQueries(std::move(transaction), Prio::Config);
+			m_Rcons[type.first]->FireAndForgetQueries(std::move(transaction), Prio::Config);
 		});
 
 		auto setOne ([&]() {
@@ -485,7 +486,8 @@ void IcingaDB::UpdateAllConfigObjects()
 			flushSets();
 		}
 
-		m_Rcon->FireAndForgetQuery({"XADD", "icinga:dump", "*", "type", lcType, "state", "done"}, Prio::Config);
+		m_Rcons[type.first]->FireAndForgetQuery({"XADD", "icinga:dump", "*", "type", lcType, "state", "done"}, Prio::Config);
+		m_Rcons[type.first]->Sync();
 	});
 
 	upq.Join();

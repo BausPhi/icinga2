@@ -3278,6 +3278,133 @@ printer_health_oids		| **Optional.** A list of oids which are downloaded and wri
 printer_health_offline		| **Optional.** The maximum number of seconds since the last update of cache file before it is considered too old.
 printer_health_multiline	| **Optional.** Multiline output
 
+#### Thola <a id="plugin-contrib-command-thola"></a>
+
+The [Thola](https://thola.io) plugin
+is a tool for monitoring network devices, that mainly uses SNMP.
+To monitor devices the subcommand `thola check` can be used.
+
+`Templates:`
+
+If you specify the Thola API address, snmp community and version in the following templates, then they will be 
+automatically used for each Thola subcommand.
+
+**generic-thola-check-command:**
+
+Name                    | Description
+------------------------|------------------------------------------------------
+thola_api_address       | Address of the Thola API to connect to
+
+
+**generic-thola-device-check-command:**
+
+Name                    | Description
+------------------------|------------------------------------------------------
+snmp_community          | SNMP community of the device
+snmp_protocol           | SNMP version to use
+
+`Commands:`
+
+The `thola check` command has eight different subcommands:
+
+A documentation of these commands can be found by running `thola check -h
+or in the plugin's API [swaggerhub documentation](https://app.swaggerhub.com/apis-docs/thola/thola/).
+To run these commands you need a server that is running the Thola API.
+If you don't know how to do this, you can also have a look at the plugin's
+[documentation](https://docs.thola.io). Also you have to
+put the Thola-client binary into the *PluginContribDir*.
+
+#### thola-check-cpu-load <a id="plugin-contrib-command-thola-check-cpu-load"></a>
+`thola check cpu-load` checks the cpu-load of a network device.
+
+Custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters):
+
+Name                    | Description
+------------------------|---------------------------------------------------------------------------
+critical                | **Optional.** Sets critical threshold for the cpu load
+warning                 | **Optional.** Sets warning threshold for the cpu load
+
+#### thola-check-interface-metrics <a id="plugin-contrib-command-thola-check-interface-metrics"></a>
+`thola check interface-metrics` checks the interface-metrics of a network device.
+
+There are no custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters).
+
+#### thola-check-hardware-health <a id="plugin-contrib-command-thola-check-hardware-health"></a>
+`thola check hardware-health` checks the hardware health of a network device.
+
+There are no custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters).
+
+#### thola-check-identify <a id="plugin-contrib-command-thola-check-identify"></a>
+`thola check identify` checks if a device can be identified by the given properties.
+
+Custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters):
+
+Name                    | Description
+------------------------|---------------------------------------------------------------------------
+model                   | **Optional.** Model that is compared to the actual model of the device
+os_version              | **Optional.** OS-version that is compared to the actual OS-version of the device
+vendor                  | **Optional.** Vendor that is compared to the actual vendor of the device
+serial_number           | **Optional.** Serial number that is compared to the actual serial number of the device
+discover_retries        | **Optional.** Sets the number of discover retries before aborting
+discover_timeouts       | **Optional.** Sets the number of discover timeouts before aborting
+
+> **Note**:
+>
+> One of the variables `model`, `os_version`, `vendor` or `serial_number` must be set
+
+
+#### thola-check-memory-usage <a id="plugin-contrib-command-thola-check-memory-usage"></a>
+`thola check memory-usage` checks the memory usage of a device.
+
+Custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters):
+
+Name                    | Description
+------------------------|---------------------------------------------------------------------------
+critical                | **Optional.** Sets critical threshold for the memory usage
+warning                 | **Optional.** Sets warning threshold for the memory usage
+
+#### thola-check-sbc <a id="plugin-contrib-command-thola-check-sbc"></a>
+`thola check sbc` checks special metrics from sbc network devices.
+
+Custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters):
+
+Name                                        | Description
+--------------------------------------------|-------------------------------------------------------
+system_health_score_critical                | **Optional.** Sets critical threshold for the health score
+system_health_score_warning                 | **Optional.** Sets warning threshold for the health score
+
+#### thola-check-thola-server <a id="plugin-contrib-command-thola-check-thola-server"></a>
+`thola check thola-server` checks if a Thola API is running on a given server.
+
+There are no custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters)
+
+#### thola-check-ups <a id="plugin-contrib-command-thola-check-ups"></a>
+`thola check ups` checks whether a UPS device has its main voltage applied.
+
+Custom variables passed as [command parameters](03-monitoring-basics.md#command-passing-parameters):
+
+Name                                      | Description
+------------------------------------------|-------------------------------------------------------
+batt_current_critical_max                 | **Optional.** Sets high critical threshold for the battery current
+batt_current_critical_min                 | **Optional.** Sets low critical threshold for the battery current
+batt_current_warning_max                  | **Optional.** Sets high warning threshold for the battery current
+batt_current_warning_min                  | **Optional.** Sets low warning threshold for the battery current
+batt_temperature_critical_max             | **Optional.** Sets high critical threshold for the battery temperature
+batt_temperature_critical_min             | **Optional.** Sets low critical threshold for the battery temperature
+batt_temperature_warning_max              | **Optional.** Sets high warning threshold for the battery temperature
+batt_temperature_warning_min              | **Optional.** Sets low warning threshold for the battery temperature
+current_load_critical_max                 | **Optional.** Sets high critical threshold for the current load
+current_load_critical_min                 | **Optional.** Sets low critical threshold for the current load
+current_load_warning_max                  | **Optional.** Sets high warning threshold for the current load
+current_load_warning_min                  | **Optional.** Sets low warning threshold for the current load
+rectifier_current_critical_max            | **Optional.** Sets high critical threshold for the current rectifier
+rectifier_current_critical_min            | **Optional.** Sets low critical threshold for the current rectifier
+rectifier_current_warning_max             | **Optional.** Sets high warning threshold for the current rectifier
+rectifier_current_warning_min             | **Optional.** Sets low warning threshold for the current rectifier
+system-voltage-critical-max               | **Optional.** Sets high critical threshold for the system voltage
+system-voltage-critical-min               | **Optional.** Sets low critical threshold for the system voltage
+system-voltage-warning-max                | **Optional.** Sets high warning threshold for the system voltage
+system-voltage-warning-min                | **Optional.** Sets low warning threshold for the system voltage
 
 ### Network Services <a id="plugin-contrib-network-services"></a>
 
